@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "React Wallet Extension",
+  "version": "1.0",
+  "description": "A simple browser extension for wallet creation and login.",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["http://*/*", "https://*/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": "vite.svg"
+  }
+}

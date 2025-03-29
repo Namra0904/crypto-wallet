@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+html,
+body {
+  min-width: 400px;
+  margin: auto;
+  padding: 0px;
+}
+
+
+.ant-steps-item-container{
+    /* display: none; */
+}   
