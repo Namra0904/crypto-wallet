@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import {
-  Card,
+  // Card,
   Button,
   Typography,
   Divider,
@@ -205,9 +205,8 @@ const OnboardingFlow = () => {
             {recoveryPhrase.map((word, index) => (
               <div
                 key={index}
-                className={`p-2 border rounded-lg text-center border-gray-300 ${
-                  !showRecoveryPhrase ? "filter blur-sm" : ""
-                }`}
+                className={`p-2 border rounded-lg text-center text-white border-gray-300 ${!showRecoveryPhrase ? "filter blur-md" : ""
+                  }`}
               >
                 {showRecoveryPhrase ? (
                   <>
@@ -251,7 +250,7 @@ const OnboardingFlow = () => {
               disabled={!showRecoveryPhrase}
             >
               {showRecoveryPhrase ? "Next" : "Next"}
-              
+
             </Button>
           </div>
         </>
@@ -280,7 +279,7 @@ const OnboardingFlow = () => {
           <div className="mb-6">
             {verificationPositions.map((position) => (
               <Row key={position} gutter={16} align="middle" className="mb-4">
-                <Col span={6}>
+                <Col span={12}>
                   <Text>Word {position}:</Text>
                 </Col>
                 <Col span={18}>
@@ -301,7 +300,7 @@ const OnboardingFlow = () => {
             ))}
           </div>
 
-          <div className="flex justify-between">
+          <div className="flex justify-between gap-4">
             <Button
               size="large"
               className="w-40 h-12 font-medium"
@@ -328,16 +327,16 @@ const OnboardingFlow = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-      <Card className="w-full max-w-lg shadow-md rounded-xl p-6">
-        <Steps current={currentStep} className="mb-8">
-          {steps.map((item, index) => (
-            <Step key={index} />
-          ))}
-        </Steps>
+    <div className="min-h-screen  flex flex-col items-center justify-center p-4">
+      {/* <Card className="w-full max-w-lg shadow-md rounded-xl p-6"> */}
+      <Steps current={currentStep} className="mb-8" type="inline">
+        {steps.map((item, index) => (
+          <Step key={index} />
+        ))}
+      </Steps>
 
-        {steps[currentStep].content}
-      </Card>
+      {steps[currentStep].content}
+      {/* </Card> */}
     </div>
   );
 };

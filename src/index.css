@@ -2,12 +2,8 @@
 
 html,
 body {
-  min-width: 400px;
+  width: 350px;
   margin: auto;
   padding: 0px;
+  background-color: black;
 }
-
-
-.ant-steps-item-container{
-    /* display: none; */
-}   

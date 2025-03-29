@@ -225,17 +225,17 @@ const OnboardingPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-      <Card className="w-full max-w-lg shadow-md rounded-xl p-6">
-        <div className="px-28">
-          <Steps current={currentStep} className="mb-8 ">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      {/* <Card className="w-full max-w-lg shadow-md rounded-xl p-6"> */}
+        <div >
+          <Steps current={currentStep} className="mb-8" type="inline" >
             {steps.map((item) => (
               <Step key={item.title}  />
             ))}
           </Steps>
         </div>
         {steps[currentStep].content}
-      </Card>
+      {/* </Card> */}
     </div>
   );
 };

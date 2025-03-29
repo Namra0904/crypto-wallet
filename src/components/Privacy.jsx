@@ -14,8 +14,8 @@ const PrivacyConsentPage = () => {
 
     }
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-      <Card className="w-full max-w-lg shadow-md rounded-xl p-6">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      {/* <Card className="w-full max-w-lg shadow-md rounded-xl p-6"> */}
         <div className="text-center mb-6">
           <Title level={3} className="mb-2">
             Help us improve
@@ -41,11 +41,11 @@ const PrivacyConsentPage = () => {
             When we gather metrics, it will always be...
           </Title>
 
-          <div className="space-y-4">
+          <div className="space-y-4 text-white">
             {["Private", "Anonymous", "Optional"].map((label, index) => (
               <div className="flex items-start" key={index}>
-                <div className="bg-blue-100 text-blue-600 rounded-full p-1 mr-3 mt-1">
-                  <InfoCircleOutlined className="h-5 w-5" />
+                <div className=" rounded-4xl p-2 mr-3 mt-1">
+                  <InfoCircleOutlined className="" />
                 </div>
                 <div>
                   <Text strong>{label}:</Text>
@@ -61,7 +61,7 @@ const PrivacyConsentPage = () => {
           </div>
         </div>
 
-        <Divider />
+        {/* <Divider /> */}
 
         <div className="mb-6">
           <Paragraph className="text-gray-700">
@@ -82,7 +82,7 @@ const PrivacyConsentPage = () => {
           </Text>
         </div>
 
-        <div className="flex justify-between">
+        <div className="flex justify-between gap-4">
           <Button
             size="large"
             className="w-40 h-12 font-medium"
@@ -99,7 +99,7 @@ const PrivacyConsentPage = () => {
             Agree
           </Button>
         </div>
-      </Card>
+      {/* </Card> */}
     </div>
   );
 };

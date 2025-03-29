@@ -18,7 +18,7 @@ const OnboardingPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-lg rounded-xl overflow-hidden bg-gray-800 border-gray-700">
+      {/* <Card className="w-full max-w-md shadow-lg rounded-xl overflow-hidden bg-gray-800 border-gray-700"> */}
         <div className="text-center mb-6">
           <Title level={3} className="mb-2 text-white">
             Let's get started
@@ -64,7 +64,7 @@ const OnboardingPage = () => {
           </Button>
         </div>
 
-        <Divider className="my-6 border-gray-700" />
+        {/* <Divider className="my-6 border-gray-700" /> */}
 
         <div className="text-center">
           <Text className="text-gray-400">
@@ -77,7 +77,7 @@ const OnboardingPage = () => {
             </a>
           </Text>
         </div>
-      </Card>
+      {/* </Card> */}
     </div>
   );
 };
