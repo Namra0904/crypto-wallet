@@ -22,6 +22,7 @@ import {
   EyeOutlined,
 } from "@ant-design/icons";
 import { hasKey, newWallet } from "../utils";
+import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 const { Step } = Steps;
@@ -32,6 +33,7 @@ const OnboardingFlow = () => {
   const [selectedWords, setSelectedWords] = useState({});
   const [verificationError, setVerificationError] = useState(false);
   const [showRecoveryPhrase, setShowRecoveryPhrase] = useState(false);
+  const navigate = useNavigate();
 
   // Mock recovery phrase
   const [recoveryPhrase, setRecoveryPhrase] = useState([]);
@@ -62,8 +64,8 @@ const OnboardingFlow = () => {
     });
 
     if (allCorrect) {
-      setCurrentStep(3); // Move to next step (or complete onboarding)
       console.log("Verification successful!");
+      navigate("/dashboard");
     } else {
       setVerificationError(true);
     }
@@ -200,9 +202,8 @@ const OnboardingFlow = () => {
             {recoveryPhrase.map((word, index) => (
               <div
                 key={index}
-                className={`p-2 border rounded-lg text-center text-white border-gray-300 ${
-                  !showRecoveryPhrase ? "filter blur-md" : ""
-                }`}
+                className={`p-2 border rounded-lg text-center text-white border-gray-300 ${!showRecoveryPhrase ? "filter blur-md" : ""
+                  }`}
               >
                 {showRecoveryPhrase ? (
                   <>

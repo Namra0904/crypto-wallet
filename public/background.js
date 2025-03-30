@@ -1,22 +1,26 @@
 let WALLET = undefined;
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  console.log("Received message:", message);
+
   if (message.type === "setWallet") {
     WALLET = message.WALLET;
     sendResponse({ success: true, WALLET });
   }
 
   if (message.type === "getWallet") {
-    console.log("bakcgrund 10", WALLET);
-
+    console.log("Background Wallet:", WALLET);
     sendResponse({ wallet: WALLET });
   }
-  console.log(message);
 
-  // if (message.type === "PIED_PAYMENT_REQUEST") {
-  //   console.log("In background of extension");
-  //   sendResponse({});
-  // }
+  if (message.type === "PIED_PAYMENT_REQUEST") {
+    console.log("Processing Payment Request:", message.message);
 
-  return true; // Only needed if handling async operations
+    // Simulate processing and send a response
+    setTimeout(() => {
+      sendResponse({ status: "success", details: "Payment Processed" });
+    }, 1000);
+
+    return true; // Required for async `sendResponse`
+  }
 });
