@@ -1,16 +1,14 @@
-(function () {
-  console.log("content.js loaded");
+window.addEventListener("message", (event) => {
+  if (
+    event.source !== window ||
+    !event.data ||
+    event.data.type !== "PIED_PAYMENT_REQUEST"
+  ) {
+    return;
+  }
 
-  window.ethereum = {
-    request: async ({ method }) => {
-      if (method === "eth_requestAccounts") {
-        return new Promise((resolve) => {
-          chrome.storage.local.get("wallet", (data) => {
-            resolve([data.wallet?.address]);
-          });
-        });
-      }
-    },
-  };
-  console.log("Injected Ethereum Provider!");
-})();
+  chrome.runtime.sendMessage({
+    type: "PIED_PAYMENT_REQUEST",
+    message: event.data.payload,
+  });
+});

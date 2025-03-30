@@ -1,9 +1,23 @@
-import Onboarding from "./components/Recover";
 import { ConfigProvider, theme } from "antd";
 import AppRoutes from "./routes";
-import SecureWallet from './components/NewWallet'
+import { initializePayment, initWalletFromBackground } from "./utils";
+import { useEffect } from "react";
 
 function App() {
+  initWalletFromBackground();
+
+  useEffect(() => {
+    const messageListener = (request, sender, sendResponse) => {
+      if (request.type === "PIED_PAYMENT_REQUEST") {
+        initializePayment(request.message.data);
+      }
+    };
+    chrome.runtime.onMessage.addListener(messageListener);
+    return () => {
+      chrome.runtime.onMessage.removeListener(messageListener);
+    };
+  }, []);
+
   return (
     <ConfigProvider
       theme={{
@@ -14,7 +28,6 @@ function App() {
       }}
     >
       <AppRoutes />
-      {/* <Onboarding /> */}
     </ConfigProvider>
   );
 }

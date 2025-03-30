@@ -29,8 +29,10 @@ const OnboardingPage = () => {
   useEffect(() => {
     const values = recoveryForm.getFieldsValue();
     const allFieldsFilled = [...Array(12)].every((_, index) => {
-      return values[`word-${index + 1}`]?.trim();
+      return values[`word-${index + 1}`]?.trim() === "";
     });
+    console.log(allFieldsFilled);
+
     setIsRecoveryComplete(allFieldsFilled);
   }, [formValues]);
 
@@ -85,8 +87,7 @@ const OnboardingPage = () => {
             form={recoveryForm}
             onFinish={onRecoveryFinish}
             // layout="inline"
-                  onValuesChange={handleValuesChange}
-                
+            onValuesChange={handleValuesChange}
           >
             <div className="grid grid-cols-3 gap-4 mb-8">
               {[...Array(12)].map((_, index) => (
@@ -94,8 +95,8 @@ const OnboardingPage = () => {
                   key={index}
                   name={`${index + 1}`}
                   label={`${index + 1}`}
-                      className=""
-                        style={{marginBottom:"0"}}
+                  className=""
+                  style={{ marginBottom: "0" }}
                 >
                   <Input
                     size=""
@@ -227,14 +228,14 @@ const OnboardingPage = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       {/* <Card className="w-full max-w-lg shadow-md rounded-xl p-6"> */}
-        <div >
-          <Steps current={currentStep} className="mb-8" type="inline" >
-            {steps.map((item) => (
-              <Step key={item.title}  />
-            ))}
-          </Steps>
-        </div>
-        {steps[currentStep].content}
+      <div>
+        <Steps current={currentStep} className="mb-8" type="inline">
+          {steps.map((item) => (
+            <Step key={item.title} />
+          ))}
+        </Steps>
+      </div>
+      {steps[currentStep].content}
       {/* </Card> */}
     </div>
   );

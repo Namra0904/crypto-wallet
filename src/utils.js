@@ -1,105 +1,169 @@
 import { ethers, HDNodeWallet } from "ethers";
 
-async function deriveKey(password, salt = "default_salt") {
-    const encoder = new TextEncoder();
-    const keyMaterial = await crypto.subtle.importKey(
-        "raw",
-        encoder.encode(password),
-        { name: "PBKDF2" },
-        false,
-        ["deriveKey"]
-    );
-    return crypto.subtle.deriveKey(
-        {
-            name: "PBKDF2",
-            salt: encoder.encode(salt),
-            iterations: 100000,
-            hash: "SHA-256"
-        },
-        keyMaterial,
-        { name: "AES-GCM", length: 256 },
-        true,
-        ["encrypt", "decrypt"]
-    );
-}
+const sendMessageToExtension = async (message) => {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage(message, (response) => {
+      if (chrome.runtime.lastError) {
+        reject(chrome.runtime.lastError);
+      } else {
+        resolve(response);
+      }
+    });
+  });
+};
 
 async function encryptData(password, data) {
-    const key = await deriveKey(password);
-    const iv = crypto.getRandomValues(new Uint8Array(12)); 
-    const encodedData = new TextEncoder().encode(JSON.stringify(data));
-    const encryptedData = await crypto.subtle.encrypt(
-        { name: "AES-GCM", iv },
-        key,
-        encodedData
-    );
-    return { iv: Array.from(iv), encryptedData: Array.from(new Uint8Array(encryptedData)) };
+  const encoder = new TextEncoder();
+  const encodedPassword = encoder.encode(password);
+
+  // Derive a key from the password
+  const keyMaterial = await window.crypto.subtle.importKey(
+    "raw",
+    encodedPassword,
+    { name: "PBKDF2" },
+    false,
+    ["deriveKey"]
+  );
+  const salt = window.crypto.getRandomValues(new Uint8Array(16));
+  const key = await window.crypto.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt: salt,
+      iterations: 100000,
+      hash: "SHA-256",
+    },
+    keyMaterial,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["encrypt"]
+  );
+
+  // Convert data to Uint8Array and encrypt
+  const iv = window.crypto.getRandomValues(new Uint8Array(12)); // Initialization Vector
+  const encryptedData = await window.crypto.subtle.encrypt(
+    { name: "AES-GCM", iv: iv },
+    key,
+    encoder.encode(JSON.stringify(data))
+  );
+
+  // Return encrypted data as Base64 along with IV & salt
+  return btoa(
+    JSON.stringify({
+      salt: Array.from(salt),
+      iv: Array.from(iv),
+      data: Array.from(new Uint8Array(encryptedData)),
+    })
+  );
 }
 
-async function decryptData(password, encryptedObject) {
-    const { iv, encryptedData } = encryptedObject;
-    const key = await deriveKey(password);
-    const decryptedData = await crypto.subtle.decrypt(
-        { name: "AES-GCM", iv: new Uint8Array(iv) },
-        key,
-        new Uint8Array(encryptedData)
-    );
-    return JSON.parse(new TextDecoder().decode(decryptedData));
+async function decryptData(password, encryptedString) {
+  const encoder = new TextEncoder();
+  const encodedPassword = encoder.encode(password);
+  const decoded = JSON.parse(atob(encryptedString));
+
+  // Extract salt, IV, and encrypted data
+  const salt = new Uint8Array(decoded.salt);
+  const iv = new Uint8Array(decoded.iv);
+  const encryptedData = new Uint8Array(decoded.data).buffer;
+
+  // Derive the key again using the same password and salt
+  const keyMaterial = await window.crypto.subtle.importKey(
+    "raw",
+    encodedPassword,
+    { name: "PBKDF2" },
+    false,
+    ["deriveKey"]
+  );
+  const key = await window.crypto.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt: salt,
+      iterations: 100000,
+      hash: "SHA-256",
+    },
+    keyMaterial,
+    { name: "AES-GCM", length: 256 },
+    false,
+    ["decrypt"]
+  );
+
+  // Decrypt the data
+  const decryptedData = await window.crypto.subtle.decrypt(
+    { name: "AES-GCM", iv: iv },
+    key,
+    encryptedData
+  );
+
+  return JSON.parse(new TextDecoder().decode(decryptedData));
 }
 
-async function storeEncryptedWallet(encryptedObject) {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open("WalletDB", 1);
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains("wallets")) {
-                db.createObjectStore("wallets", { keyPath: "id" });
-            }
-        };
-        request.onsuccess = () => {
-            const db = request.result;
-            const tx = db.transaction("wallets", "readwrite");
-            tx.objectStore("wallets").put({ id: "user_wallet", data: encryptedObject });
-            tx.oncomplete = () => resolve();
-        };
-        request.onerror = () => reject(request.error);
-    });
-}
+let WALLET = undefined;
 
-async function getEncryptedWallet() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open("WalletDB", 1);
-        request.onsuccess = () => {
-            const db = request.result;
-            const tx = db.transaction("wallets", "readonly");
-            const store = tx.objectStore("wallets");
-            const req = store.get("user_wallet");
-            req.onsuccess = () => resolve(req.result?.data || null);
-            req.onerror = () => reject(req.error);
-        };
-        request.onerror = () => reject(request.error);
-    });
-}
+const initWalletFromBackground = async () => {
+  const wallet = await sendMessageToExtension({
+    type: "getWallet",
+  });
 
-async function generateEncryptedWallet(password) {
-    const entropy = ethers.randomBytes(16); 
-    const mnemonic = ethers.Mnemonic.fromEntropy(entropy).phrase;
-    console.log(mnemonic);
+  if (!wallet.wallet) {
+    return;
+  }
 
-    const wallet = HDNodeWallet.fromPhrase(mnemonic);
-    console.log(wallet);
+  if (wallet.wallet) {
+    WALLET = wallet.wallet;
+    console.log("User already exists!", WALLET.wallet);
+  }
+};
 
-    const walletData = { mnemonic, privateKey: wallet.privateKey, publicKey: wallet.publicKey };
+const loadDecryptedWallet = (password) => {
+  return new Promise((resolve, reject) => {
+    decryptData(password, localStorage.getItem("wallet_details"))
+      .then((val) => {
+        WALLET = val;
+        resolve(val);
+      })
+      .catch((val) => {
+        reject(val);
+      });
+  });
+};
 
-    const encryptedWallet = await encryptData(password, walletData);
-    await storeEncryptedWallet(encryptedWallet);
-    return encryptedWallet;
-}
+const newWallet = (password) => {
+  const entropy = ethers.randomBytes(16);
+  const mnemonic = ethers.Mnemonic.fromEntropy(entropy).phrase;
+  const wallet = HDNodeWallet.fromPhrase(mnemonic);
+  const walletData = {
+    mnemonic,
+    privateKey: wallet.privateKey,
+    publicKey: wallet.publicKey,
+  };
 
-async function decryptWallet(password) {
-    const encryptedWallet = await getEncryptedWallet();
-    if (!encryptedWallet) throw new Error("No encrypted wallet found");
-    return await decryptData(password, encryptedWallet);
-}
+  return new Promise((resolve, reject) => {
+    encryptData(password, walletData)
+      .then(async (encryptedData) => {
+        localStorage.setItem("wallet_details", encryptedData);
+        const wallet = await sendMessageToExtension({
+          type: "setWallet",
+          WALLET: walletData,
+        });
+        resolve(walletData.mnemonic);
+      })
+      .catch(reject);
+  });
+};
 
+const initializePayment = (data) => {
+  console.log("initialize payment", data);
+};
 
-export {generateEncryptedWallet, decryptWallet}
+const hasKey = () => !!WALLET;
+
+export {
+  sendMessageToExtension,
+  newWallet,
+  decryptData,
+  encryptData,
+  hasKey,
+  initializePayment,
+  loadDecryptedWallet,
+  initWalletFromBackground,
+};

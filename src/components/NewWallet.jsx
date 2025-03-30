@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { generateEncryptedWallet, decryptWallet } from "../utils";
 import {
   // Card,
   Button,
@@ -22,6 +21,7 @@ import {
   CopyOutlined,
   EyeOutlined,
 } from "@ant-design/icons";
+import { hasKey, newWallet } from "../utils";
 
 const { Title, Text } = Typography;
 const { Step } = Steps;
@@ -34,28 +34,21 @@ const OnboardingFlow = () => {
   const [showRecoveryPhrase, setShowRecoveryPhrase] = useState(false);
 
   // Mock recovery phrase
-  const recoveryPhrase = [
-    "rescue",
-    "false",
-    "doctor",
-    "rally",
-    "vocal",
-    "grief",
-    "tortoise",
-    "order",
-    "meat",
-    "weather",
-    "disease",
-    "round",
-  ];
+  const [recoveryPhrase, setRecoveryPhrase] = useState([]);
 
   // Positions to verify (random 3 words)
   const verificationPositions = [1, 5, 9]; // Positions to verify (1-based index)
 
-  const onPasswordFinish = (values) => {
+  const onPasswordFinish = async (values) => {
     const password = values.confirmPassword;
-    generateEncryptedWallet(password)
-    setCurrentStep(1);
+    newWallet(password)
+      .then((val) => {
+        setRecoveryPhrase(val.split(" "));
+        setCurrentStep(1);
+      })
+      .catch((val) => {
+        console.log(val);
+      });
   };
 
   const handleWordSelect = (position, value) => {
@@ -207,8 +200,9 @@ const OnboardingFlow = () => {
             {recoveryPhrase.map((word, index) => (
               <div
                 key={index}
-                className={`p-2 border rounded-lg text-center text-white border-gray-300 ${!showRecoveryPhrase ? "filter blur-md" : ""
-                  }`}
+                className={`p-2 border rounded-lg text-center text-white border-gray-300 ${
+                  !showRecoveryPhrase ? "filter blur-md" : ""
+                }`}
               >
                 {showRecoveryPhrase ? (
                   <>
@@ -252,7 +246,6 @@ const OnboardingFlow = () => {
               disabled={!showRecoveryPhrase}
             >
               {showRecoveryPhrase ? "Next" : "Next"}
-
             </Button>
           </div>
         </>
@@ -332,9 +325,15 @@ const OnboardingFlow = () => {
     <div className="min-h-screen  flex flex-col items-center justify-center p-4">
       {/* <Card className="w-full max-w-lg shadow-md rounded-xl p-6"> */}
       <Steps current={currentStep} className="mb-8" type="inline">
-        {steps.map((item, index) => (
-          <Step key={index} />
-        ))}
+        {hasKey() ? (
+          "Token already provided!"
+        ) : (
+          <>
+            {steps.map((item, index) => (
+              <Step key={index} />
+            ))}
+          </>
+        )}
       </Steps>
 
       {steps[currentStep].content}
