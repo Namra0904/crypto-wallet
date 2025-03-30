@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { generateEncryptedWallet, decryptWallet } from "../utils";
 import {
   // Card,
   Button,
@@ -52,7 +53,8 @@ const OnboardingFlow = () => {
   const verificationPositions = [1, 5, 9]; // Positions to verify (1-based index)
 
   const onPasswordFinish = (values) => {
-    console.log("Password created:", values);
+    const password = values.confirmPassword;
+    generateEncryptedWallet(password)
     setCurrentStep(1);
   };
 

@@ -1,4 +1,6 @@
 (function () {
+  console.log("content.js loaded");
+
   window.ethereum = {
     request: async ({ method }) => {
       if (method === "eth_requestAccounts") {
