@@ -9,6 +9,7 @@ const Recover = lazy(() => import("./components/Recover"));
 const NewWallet = lazy(() => import("./components/NewWallet"));
 const LoginWallet = lazy(() => import("./components/Login"));
 const Dashboard = lazy(() => import("./components/Dashboard"));
+// const PasswordVerification = lazy(() => import("./components/Dashboard"));
 const AppRoutes = () => {
   return (
     <Routes>

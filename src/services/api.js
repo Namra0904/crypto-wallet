@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://pied-wallet.vercel.app";
+const BASE_URL = "https://piedwalletprod.vercel.app";
 
 const axiosInstance = axios.create({
     baseURL: BASE_URL,
@@ -12,7 +12,7 @@ const axiosInstance = axios.create({
 
 export const getGraphData = async(address) => {
     try {
-        const response = await axiosInstance.get(`/graph-data/${address}`);
+        const response = await axiosInstance.get(`/graph-data/${address}}`);
         console.log('transactions', response.data)
         return response.data;
     } catch (error) {

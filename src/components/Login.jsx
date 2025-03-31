@@ -10,14 +10,18 @@ const { Title, Text } = Typography;
 const PasswordVerification = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { wallet, unlockWallet } = useWallet();
+  const { wallet, unlockWallet,setWallet } = useWallet();
 
   const onFinish = async (values) => {
     setLoading(true);
 
     if (localStorage.getItem("wallet_details")) {
-      unlockWallet(values.password);
+      loadDecryptedWallet(values.password)
+        .then(setWallet)
+        .catch(() => console.log("Failed to load wallet"));
+
     } else {
+
       navigate("/recover");
       message.error("Cannot decrypt key. Please use recovery phrases!");
       setLoading(false);
@@ -44,6 +48,7 @@ const PasswordVerification = () => {
             prefix={<LockOutlined className="text-gray-400" />}
             placeholder="Enter your password"
             size="large"
+            name="password"
             className="bg-gray-700 border-gray-600 text-white"
           />
         </Form.Item>

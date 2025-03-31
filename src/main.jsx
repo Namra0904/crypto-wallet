@@ -8,10 +8,10 @@ import { WalletProvider } from "./components/WalletProvider.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <WalletProvider>
-      <HashRouter>
+    <HashRouter>
+      <WalletProvider>
         <App />
-      </HashRouter>
-    </WalletProvider>
+      </WalletProvider>
+    </HashRouter>
   </StrictMode>
 );

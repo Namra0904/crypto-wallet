@@ -7,11 +7,13 @@ import {
     lockWallet,
     getWalletDetails,
 } from "../services/utils"; // Import your wallet functions
+import { useNavigate } from "react-router-dom";
 
 const WalletContext = createContext();
 
 export const WalletProvider = ({ children }) => {
     const [wallet, setWallet] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (hasKey()) {
@@ -19,6 +21,7 @@ export const WalletProvider = ({ children }) => {
             loadDecryptedWallet(password)
                 .then(setWallet)
                 .catch(() => console.log("Failed to load wallet"));
+            // navigate('/login')
         } else {
             initWalletFromBackground().then(setWallet);
         }
@@ -47,7 +50,7 @@ export const WalletProvider = ({ children }) => {
 
     return (
         <WalletContext.Provider
-            value={{ wallet, createNewWallet, unlockWallet, lockCurrentWallet }}
+            value={{ wallet, createNewWallet, unlockWallet, lockCurrentWallet, setWallet }}
         >
             {children}
         </WalletContext.Provider>

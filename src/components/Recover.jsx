@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import {
   Card,
@@ -8,15 +9,19 @@ import {
   Form,
   Checkbox,
   Steps,
+  message,
 } from "antd";
 import {
   InfoCircleOutlined,
   EyeInvisibleOutlined,
   EyeTwoTone,
 } from "@ant-design/icons";
+import { ethers } from "ethers";
 
 const { Title, Text } = Typography;
 const { Step } = Steps;
+import { useNavigate } from "react-router-dom";
+import { hasKey, newWallet } from "../services/utils";
 
 const OnboardingPage = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -24,28 +29,65 @@ const OnboardingPage = () => {
   const [passwordForm] = Form.useForm();
   const [isRecoveryComplete, setIsRecoveryComplete] = useState(false);
   const [formValues, setFormValues] = useState({});
+  const [wallet, setWallet] = useState();
+  const [privateKey, setPrivate] = useState();
+  const [publicKey, setPublic] = useState();
+  const [allWord, setAllWord] = useState("")
+
+  const [seedPhrase, setSeedPhrase] = useState(""); // Add this state
+  const navigate = useNavigate();
+  const [list, setList] = useState("");
+  const [address, setAddress] = useState("");
 
   // Watch form values changes
   useEffect(() => {
     const values = recoveryForm.getFieldsValue();
     const allFieldsFilled = [...Array(12)].every((_, index) => {
-      return values[`word-${index + 1}`]?.trim() === "";
+      return values[`${index + 1}`]?.trim() !== "";
     });
-    console.log(allFieldsFilled);
 
     setIsRecoveryComplete(allFieldsFilled);
-  }, [formValues]);
+  }, [formValues, recoveryForm]);
 
   const onRecoveryFinish = (values) => {
-    console.log("Recovery values:", values);
-    setCurrentStep(1);
-  };
+    console.log(values);
+    const seedWords = Object.values(values).filter(
+      (word) => word.trim() !== ""
+    );
+    const typedSeed = seedWords.join(" ");
+    console.log("typedSeed :: " + typedSeed);
+    try {
+      // Recover the wallet from the seed phrase
+      const recoveredWallet = ethers.Wallet.fromPhrase(typedSeed);
+      console.log("recoverWallet :: " + recoveredWallet);
 
-  const onPasswordFinish = (values) => {
-    console.log("Password values:", values);
-    const recoveryValues = recoveryForm.getFieldsValue();
-    console.log("Complete submission:", { ...recoveryValues, ...values });
-    // Proceed with wallet creation/import
+      // Set the wallet state
+      setAllWord(typedSeed)
+      setWallet(recoveredWallet.address);
+      setPrivate(recoveredWallet.privateKey)
+      setPublic(recoveredWallet.publicKey)
+      setSeedPhrase(typedSeed);
+
+      // Move to next step or navigate directly to dashboard
+      setCurrentStep(1);
+      // Or navigate directly:
+      // navigate('/dashboard');
+    } catch (error) {
+      console.error("Error recovering wallet:", error);
+      message.error("Invalid recovery phrase. Please check and try again.");
+    }
+  };
+  const onPasswordFinish = async (values) => {
+    const password = values.confirmPassword;
+    newWallet(password, wallet, privateKey, publicKey, allWord)
+      .then((val) => {
+        // setRecoveryPhrase(val.split(" "));
+        navigate("/dashboard");
+        // console.log("Working");
+      })
+      .catch((val) => {
+        console.log(val);
+      });
   };
 
   const handleValuesChange = (changedValues, allValues) => {
@@ -227,7 +269,6 @@ const OnboardingPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      {/* <Card className="w-full max-w-lg shadow-md rounded-xl p-6"> */}
       <div>
         <Steps current={currentStep} className="mb-8" type="inline">
           {steps.map((item) => (
@@ -236,7 +277,6 @@ const OnboardingPage = () => {
         </Steps>
       </div>
       {steps[currentStep].content}
-      {/* </Card> */}
     </div>
   );
 };

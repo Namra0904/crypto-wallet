@@ -86,14 +86,14 @@ const Dashboard = () => {
     // Sort transactions by date
     const sortedTransactions = [...graphData].sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime))
 
-    console.log('s', sortedTransactions)
+    // console.log('s', sortedTransactions)
     // Create cumulative balance data
     let balance = 0
     return sortedTransactions.map((tx) => {
-      if (tx.type === "received") {
-        balance += tx.amount
-      } else {
+      if (tx.type === "sent") {
         balance -= tx.amount
+      } else {
+        balance += tx.amount
       }
 
       return {
@@ -173,7 +173,7 @@ const Dashboard = () => {
       title: "Type",
       key: "type",
       render: (_, record) => {
-        const isSent = record.from.toLowerCase() === wallet.address.toLowerCase()
+        const isSent = record.type.toLowerCase() === "sent"
         return (
           <span style={{ color: isSent ? "#ff4d4f" : "#52c41a" }}>
             {isSent ? <ArrowUpOutlined /> : <ArrowDownOutlined />} {isSent ? "Sent" : "Received"}
