@@ -61,7 +61,7 @@ const OnboardingPage = () => {
             Access your wallet with your Secret Recovery Phrase
           </Title>
           <Text type="secondary" className="block text-center mb-4">
-            MetaMask cannot recover your password. We will use your Secret
+            PiedWallet cannot recover your password. We will use your Secret
             Recovery Phrase to validate your ownership, restore your wallet, and
             set up a new password.
           </Text>

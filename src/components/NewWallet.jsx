@@ -21,7 +21,7 @@ import {
   CopyOutlined,
   EyeOutlined,
 } from "@ant-design/icons";
-import { hasKey, newWallet } from "../utils";
+import { hasKey, newWallet } from "../services/utils";
 import { useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;

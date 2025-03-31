@@ -7,3 +7,7 @@ body {
   padding: 0px;
   background-color: black;
 }
+
+::-webkit-scrollbar{
+  display:none;
+}

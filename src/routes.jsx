@@ -1,5 +1,7 @@
-import { lazy, Suspense } from "react";
+import { lazy } from "react";
 import { Routes, Route } from "react-router-dom";
+import { hasKey } from "./services/utils";
+import { Navigate } from "react-router-dom";
 
 const Onboarding = lazy(() => import("./components/Onboarding"));
 const Privacy = lazy(() => import("./components/Privacy"));
@@ -9,17 +11,15 @@ const LoginWallet = lazy(() => import("./components/Login"));
 const Dashboard = lazy(() => import("./components/Dashboard"));
 const AppRoutes = () => {
   return (
-    // <Suspense fallback={<div>Loading...</div>}>
     <Routes>
       <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/" element={<Onboarding />} />
+      <Route path="/" element={hasKey() ? <Navigate to="/dashboard" /> : <Onboarding />} />
       <Route path="/boarding" element={<Onboarding />} />
       <Route path="/security" element={<Privacy />} />
       <Route path="/recover" element={<Recover />} />
       <Route path="/create" element={<NewWallet />} />
       <Route path="/login" element={<LoginWallet />} />
     </Routes>
-    // </Suspense>
   );
 };
 

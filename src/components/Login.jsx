@@ -1,33 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Form, Input, Button, message, Typography } from "antd";
 import { LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { loadDecryptedWallet } from "../utils";
+import { useWallet } from "./WalletProvider";
+import { loadDecryptedWallet } from "../services/utils";
 
 const { Title, Text } = Typography;
 
 const PasswordVerification = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { wallet, unlockWallet } = useWallet();
 
   const onFinish = async (values) => {
     setLoading(true);
 
     if (localStorage.getItem("wallet_details")) {
-      loadDecryptedWallet(values.password)
-        .then((val) => {
-          navigate("/dashboard");
-          console.log(val);
-          setLoading(false);
-        })
-        .catch((val) => {
-          console.log(val);
-          setLoading(false);
-          message.error("Password not true");
-        });
+      unlockWallet(values.password);
     } else {
       navigate("/recover");
-      message.error("Cant decrypt key please use phrases!");
+      message.error("Cannot decrypt key. Please use recovery phrases!");
       setLoading(false);
     }
   };
@@ -35,10 +27,8 @@ const PasswordVerification = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <div className="text-center mb-6">
-        <Title level={3} className="mb-2 text-white">
-          Welcome Back!
-        </Title>
-        <Text className="text-lg text-gray-300"></Text>
+        <Title level={3} className="mb-2 text-white">Welcome Back!</Title>
+        <Text className="text-lg text-gray-300">Enter your password to unlock your wallet.</Text>
       </div>
       <Form
         name="password_verification"

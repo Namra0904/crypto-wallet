@@ -109,8 +109,8 @@ const initWalletFromBackground = async () => {
   }
 
   if (wallet.wallet) {
-    WALLET = wallet.wallet;
-    console.log("User already exists!", WALLET.wallet);
+    WALLET = wallet;
+    console.log("User already exists!", WALLET);
   }
 };
 
@@ -135,6 +135,7 @@ const newWallet = (password) => {
     mnemonic,
     privateKey: wallet.privateKey,
     publicKey: wallet.publicKey,
+    address: wallet.address
   };
 
   return new Promise((resolve, reject) => {
@@ -155,15 +156,32 @@ const initializePayment = (data) => {
   console.log("initialize payment", data);
 };
 
-const hasKey = () => !!WALLET;
+const lockWallet = () => {
+  localStorage.removeItem("wallet_details");
+  WALLET = undefined;
+  console.log("Wallet locked. Data cleared from local storage.");
+};
+
+
+const hasKey = () => {
+  return localStorage.getItem("wallet_details") !== null;
+};
+
+const getWalletDetails = () => {
+  if (WALLET !== null || WALLET !== undefined) {
+    return WALLET;
+  } else {
+    loadDecryptedWallet(password);
+    return WALLET;
+  }
+};
 
 export {
-  sendMessageToExtension,
   newWallet,
-  decryptData,
-  encryptData,
   hasKey,
   initializePayment,
   loadDecryptedWallet,
   initWalletFromBackground,
+  lockWallet,
+  getWalletDetails
 };

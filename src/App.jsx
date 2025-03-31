@@ -1,6 +1,6 @@
 import { ConfigProvider, theme } from "antd";
 import AppRoutes from "./routes";
-import { initializePayment, initWalletFromBackground } from "./utils";
+import { initializePayment, initWalletFromBackground } from "./services/utils";
 import { useEffect } from "react";
 
 function App() {
